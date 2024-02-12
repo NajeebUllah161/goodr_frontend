@@ -1,7 +1,8 @@
 import axios from 'axios';
 import {LOADER_OFF, LOADER_ON} from '../Types';
 import {apiClient} from './axiosInstance';
-import {STATUS_CODE} from '../../constants/theme';
+import {APP_STRINGS, STATUS_CODE} from '../../constants/theme';
+import {consoleLog} from '../../utils/Reusables';
 
 const apiCall =
   (config, successType, loaderStatus = 'on', loaderStatusClose = 'on') =>
@@ -13,19 +14,23 @@ const apiCall =
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    console.log('REQ Params : ', config);
+    consoleLog(APP_STRINGS.REQ_PARAMS, config);
+
     const {data} = await apiClient({
       ...config,
       cancelToken: source.token,
     }).catch(function (error) {
-      if (error?.code === 'ERR_NETWORK' || error?.message === 'Network Error') {
-        console.log('Error Code : ', error.code);
-        console.log('Error Message : ', error.message);
+      if (
+        error?.code === APP_STRINGS.ERR_NETWORK ||
+        error?.message === APP_STRINGS.NETWORK_ERROR
+      ) {
+        consoleLog(APP_STRINGS.ERR_CODE, error.code);
+        consoleLog(APP_STRINGS.ERR_MESSAGE, error.message);
         dispatch({
-          type: 'ERROR',
+          type: APP_STRINGS.TYPE_ERROR,
           payload: {
-            title: 'Network Error',
-            error: 'Please check your internet connectivity',
+            title: APP_STRINGS.NETWORK_ERROR_TITLE,
+            error: APP_STRINGS.NETWORK_ERROR_MSG,
           },
         });
       }
@@ -33,7 +38,7 @@ const apiCall =
         if (error.response.status === STATUS_CODE.UNAUTHORIZED) {
           dispatch({type: successType, payload: error.response.data});
           dispatch({
-            type: 'ERROR',
+            type: APP_STRINGS.TYPE_ERROR,
             payload: {title: 'Error', ...error.response.data},
           });
           if (loaderStatusClose === 'on') {
@@ -41,44 +46,50 @@ const apiCall =
           }
           return;
         }
-        if (error.response.status === 405) {
+        if (error.response.status === STATUS_CODE.NOT_ALLOWED) {
           dispatch({
-            type: 'ERROR',
+            type: APP_STRINGS.TYPE_ERROR,
             payload: {
-              title: 'Error 405',
-              error: 'Method not allowed',
+              title: APP_STRINGS.TITLE_NOT_ALLOWED,
+              error: APP_STRINGS.MSG_NOT_ALLOWED,
             },
           });
         }
 
-        if (error.response.status === 500) {
+        if (error.response.status === STATUS_CODE.SERVER_ERROR) {
           dispatch({
-            type: 'ERROR',
+            type: APP_STRINGS.TYPE_ERROR,
             payload: {
-              title: 'Error 500',
-              error: 'Server Error',
+              title: APP_STRINGS.TITLE_ERR_500,
+              error: APP_STRINGS.SERVER_ERROR_MSG,
             },
           });
         }
 
-        console.log('Data Error : ', error.response.data);
-        console.log('Status Error : ', error.response.status);
-        console.log('Header Error : ', error.response.headers);
+        if (error.response.status === STATUS_CODE.NOT_FOUND) {
+          dispatch({
+            type: APP_STRINGS.TYPE_ERROR,
+            payload: {
+              title: APP_STRINGS.TITLE_NOT_FOUND,
+              error: error?.response?.data?.message,
+            },
+          });
+        }
+
+        consoleLog(APP_STRINGS.DATA_ERROR, error.response.data);
+        consoleLog(APP_STRINGS.STATUS_ERROR, error.response.status);
+        consoleLog(APP_STRINGS.HEADER_ERROR, error.response.headers);
       } else if (error.request) {
-        console.log('Request Error : ', error.request);
+        consoleLog(APP_STRINGS.REQ_ERROR, error.request);
       } else {
-        console.log('Message Error : ', error.message);
+        consoleLog(APP_STRINGS.MSG_ERROR, error.message);
       }
       if (loaderStatusClose === 'on') {
         dispatch({type: LOADER_OFF});
       }
-      console.log('Config Error : ', error.config);
+      consoleLog(APP_STRINGS.CONFIG_ERROR, error.config);
     });
     dispatch({type: successType, payload: data});
-    // dispatch({
-    //   type: 'ERROR',
-    //   payload: {title: 'Error', ...data},
-    // });
     if (loaderStatusClose === 'on') {
       dispatch({type: LOADER_OFF});
     }

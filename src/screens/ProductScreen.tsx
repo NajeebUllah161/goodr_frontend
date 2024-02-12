@@ -10,6 +10,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -29,7 +30,7 @@ import {ProductsResponse} from '../classes/ProductResponse';
 import EmptyListComponent from '../components/EmptyListComponent';
 import Loader from '../components/Loader';
 import {ASSETS, COLORS_PRIMARY, FONTS, SIZES} from '../constants';
-import {END_POINTS, METHODS} from '../constants/theme';
+import {APP_STRINGS, END_POINTS, METHODS} from '../constants/theme';
 import {DELETE_PRODUCT, PRODUCTS} from '../redux/Types';
 import apiCall from '../redux/actions/apiCall';
 import {consoleLog} from '../utils/Reusables';
@@ -40,7 +41,9 @@ export type ProductScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const ProductScreen = ({navigation}: {navigation: any}) => {
-  const [productsData, setProductsData] = useState<any>([]);
+  const [search, setSearch] = useState('');
+  const [filteredDataSource, setFilteredDataSource] = useState<any>([]);
+  const [masterDataSource, setMasterDataSource] = useState<any>([]);
   const loginResponse: LoginResponse = useSelector(
     (state: any) => state.auth?.loginResponse,
   );
@@ -62,7 +65,8 @@ const ProductScreen = ({navigation}: {navigation: any}) => {
   useUpdateEffect(() => {
     if (productsResponse.data) {
       consoleLog('Success Products Response : ', productsResponse);
-      setProductsData(productsResponse?.data);
+      setFilteredDataSource(productsResponse?.data);
+      setMasterDataSource(productsResponse?.data);
     } else {
       consoleLog('Error Products Response : ', productsResponse.error);
     }
@@ -91,18 +95,22 @@ const ProductScreen = ({navigation}: {navigation: any}) => {
   };
 
   const deleteProductHandler = (id: number, name: string) => {
-    Alert.alert('Delete', `Are you sure you want to delete ${name} ?`, [
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      },
-      {
-        text: 'Delete',
-        onPress: () => executeDeletion(id),
-        style: 'destructive',
-      },
-    ]);
+    Alert.alert(
+      APP_STRINGS.DELETE,
+      `Are you sure you want to delete ${name} ?`,
+      [
+        {
+          text: APP_STRINGS.CANCEL,
+          onPress: () => consoleLog('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: APP_STRINGS.DELETE,
+          onPress: () => executeDeletion(id),
+          style: 'destructive',
+        },
+      ],
+    );
   };
 
   const executeDeletion = (id: number) => {
@@ -117,7 +125,7 @@ const ProductScreen = ({navigation}: {navigation: any}) => {
     Alert.alert('Logout', 'Are you sure to logout?', [
       {
         text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
+        onPress: () => consoleLog('Cancel Pressed'),
         style: 'cancel',
       },
       {
@@ -126,6 +134,27 @@ const ProductScreen = ({navigation}: {navigation: any}) => {
         style: 'destructive',
       },
     ]);
+  };
+
+  const searchFilterFunction = (text: string) => {
+    // Check if searched text is not blank
+    if (text) {
+      // Inserted text is not blank
+      // Filter the masterDataSource
+      // Update FilteredDataSource
+      const newData = masterDataSource.filter(function (item: {name: string}) {
+        const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilteredDataSource(newData);
+      setSearch(text);
+    } else {
+      // Inserted text is blank
+      // Update FilteredDataSource with masterDataSource
+      setFilteredDataSource(masterDataSource);
+      setSearch(text);
+    }
   };
 
   type ProductProps = {
@@ -220,15 +249,7 @@ const ProductScreen = ({navigation}: {navigation: any}) => {
                 alignItems: 'center',
                 marginTop: SIZES.m16,
               }}>
-              <Text
-                style={{
-                  fontFamily: FONTS.InterMedium,
-                  color: COLORS_PRIMARY.blue,
-                  marginEnd: SIZES.m6,
-                  fontSize: fp(1.8),
-                }}
-                children={'Details'}
-              />
+              <Text style={styles.details} children={APP_STRINGS.DETAILS} />
               <ArrowBlue
                 style={{marginTop: SIZES.m2}}
                 height={hp(2.9)}
@@ -264,31 +285,10 @@ const ProductScreen = ({navigation}: {navigation: any}) => {
       source={ASSETS.myEnrolledCoursesBg}
       style={styles.container}>
       <SafeAreaView>
-        <View
-          style={{
-            backgroundColor: COLORS_PRIMARY.white,
-            alignItems: 'center',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            padding: SIZES.p16,
-            marginTop: StatusBar.currentHeight,
-            shadowColor: COLORS_PRIMARY.shadowColor,
-            shadowOffset: {
-              width: 0,
-              height: 1,
-            },
-            shadowOpacity: 0.1,
-            shadowRadius: 2,
-            elevation: 2,
-          }}>
+        <View style={styles.subContainer}>
           <Text
-            style={{
-              fontSize: fp(2.2),
-              color: COLORS_PRIMARY.heading,
-              fontFamily: FONTS.InterSemiBold,
-              fontWeight: '500',
-            }}
-            children="All Products"
+            style={styles.allProductsText}
+            children={APP_STRINGS.ALL_PRODUCTS}
           />
           <TouchableOpacity onPress={logoutHandler}>
             <LogoutIcon
@@ -300,13 +300,26 @@ const ProductScreen = ({navigation}: {navigation: any}) => {
         </View>
       </SafeAreaView>
       <View style={[styles.container, {padding: SIZES.p16}]}>
-        {/* Flat list items  */}
+        {/* Search bar */}
+        <View style={styles.searchContainer}>
+          <View style={styles.searchSubContainer}>
+            <TextInput
+              placeholder="Type course name or topic"
+              placeholderTextColor={COLORS_PRIMARY.placeholder}
+              selectionColor={COLORS_PRIMARY.placeholder}
+              value={search}
+              underlineColorAndroid="transparent"
+              onChangeText={(text: string) => searchFilterFunction(text)}
+              style={styles.search}
+            />
+          </View>
+        </View>
         <View style={{marginTop: SIZES.m14, ...styles.container}}>
           <FlatList
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{flexGrow: 1}}
-            data={productsData}
+            data={filteredDataSource}
             renderItem={({item}) => (
               <Item
                 id={item?.id}
@@ -330,13 +343,68 @@ const ProductScreen = ({navigation}: {navigation: any}) => {
 export default ProductScreen;
 
 const styles = StyleSheet.create({
-  container: {flex: 1},
+  container: {flex: SIZES.flex1},
   item: {
     backgroundColor: COLORS_PRIMARY.white,
     marginVertical: 8,
     borderRadius: SIZES.r8,
   },
   title: {
-    fontSize: 32,
+    fontSize: SIZES.f32,
+  },
+  search: {
+    flex: SIZES.flex1,
+    color: COLORS_PRIMARY.subHeading,
+    fontFamily: FONTS.InterRegular,
+    fontSize: fp(2),
+    padding: SIZES.p13,
+  },
+  searchSubContainer: {
+    flexDirection: 'row',
+    flex: SIZES.flex1,
+    alignItems: 'center',
+    backgroundColor: COLORS_PRIMARY.white,
+    borderRadius: SIZES.r60,
+    shadowColor: COLORS_PRIMARY.shadowColor,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 0.8,
+    elevation: 1,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  subContainer: {
+    backgroundColor: COLORS_PRIMARY.white,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: SIZES.p16,
+    marginTop: StatusBar.currentHeight,
+    shadowColor: COLORS_PRIMARY.shadowColor,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  allProductsText: {
+    fontSize: fp(2.2),
+    color: COLORS_PRIMARY.heading,
+    fontFamily: FONTS.InterSemiBold,
+    fontWeight: '500',
+  },
+  details: {
+    fontFamily: FONTS.InterMedium,
+    color: COLORS_PRIMARY.blue,
+    marginEnd: SIZES.m6,
+    fontSize: fp(1.8),
   },
 });

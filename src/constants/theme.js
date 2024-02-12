@@ -12,7 +12,6 @@ export const COLORS_PRIMARY = {
   renewalDue: '#78BEFF',
   expired: '#FF7272',
   placeholder: '#CACEDB',
-  courseDateBg: '#EAEDF3',
   heading: '#232732',
   subHeading: '#464A54',
   label: '#737782',
@@ -21,9 +20,11 @@ export const COLORS_PRIMARY = {
   certifiedProfile: '#39B882',
   shadowColor: '#000',
   reasonBg: '#F5F6F9',
+  selectionColor: 'rgba(0, 0, 0, 0.5)',
 };
 
 export const IS_IOS = Platform.OS === 'ios';
+
 export const {height, width} = Dimensions.get('window');
 
 export const IS_ANDROID = Platform.OS === 'android';
@@ -33,6 +34,7 @@ export const SIZES = {
   w25: 25,
   zero: 0,
   p9: 9,
+  f32: 32,
   f22: 22,
   p11: 11,
   m36: 36,
@@ -236,17 +238,49 @@ export const WEIGHTS = {
 };
 
 export const APP_STRINGS = {
-  // splashScreen: 'Splash Screen',
+  ERR_NETWORK: 'ERR_NETWORK',
+  NETWORK_ERROR: 'ERR_NETWORK',
+  ERR_CODE: 'Error Code : ',
+  ERR_MESSAGE: 'Error Message : ',
+  REQ_PARAMS: 'Request Params : ',
+  NETWORK_ERROR_TITLE: 'Network Error',
+  NETWORK_ERROR_MSG: 'Please check your internet connectivity',
+  TYPE_ERROR: 'ERROR',
+  TITLE_NOT_ALLOWED: 'Error 405',
+  MSG_NOT_ALLOWED: 'Method not allowed',
+  CONFIG_ERROR: 'Config Error : ',
+  MSG_ERROR: 'Message Error : ',
+  REQ_ERROR: 'Request Error : ',
+  HEADER_ERROR: 'Header Error : ',
+  STATUS_ERROR: 'Status Error : ',
+  DATA_ERROR: 'Data Error : ',
+  TITLE_NOT_FOUND: 'Not Found',
+  TITLE_ERR_500: 'Error 500',
+  SERVER_ERROR_MSG: 'Server Error',
+  TIMEOUT: 1000,
+  TITLE_VALIDATION_ERROR: 'Validation Error',
+  LOGIN: 'Login',
+  USERNAME: 'Username',
+  PASSWORD: 'Password',
+  PRODUCT_DETAILS: 'Product Details',
+  DETAILS: 'Details',
+  ALL_PRODUCTS: 'All Products',
+  DELETE: 'Delete',
+  CANCEL: 'Cancel',
+  NO_RECORD_FOUND: 'No Record Found',
 };
 
 export const STATUS_CODE = Object.freeze({
   SUCCESS: 200,
   FAILURE: 1,
   UNAUTHORIZED: 401,
+  NOT_FOUND: 404,
+  SERVER_ERROR: 500,
+  NOT_ALLOWED: 405,
 });
 
 export const SCREENS = {
-  SPLASH: 'splash',
+  LOGIN: 'login',
 };
 
 export const END_POINTS = {
@@ -259,6 +293,8 @@ export const END_POINTS = {
 export const METHODS = {
   POST: 'post',
   DELETE: 'delete',
+  PATCH: 'patch',
+  PUT: 'put',
 };
 
 export const URLS = {

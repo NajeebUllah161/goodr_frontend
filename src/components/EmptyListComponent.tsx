@@ -1,15 +1,16 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {responsiveFontSize as fp} from 'react-native-responsive-dimensions';
-import {COLORS_PRIMARY} from '../constants';
+import {APP_STRINGS, COLORS_PRIMARY, SIZES} from '../constants';
 import {useSelector} from 'react-redux';
 
 const EmptyListComponent = () => {
   const currentTheme = useSelector((state: any) => state.util?.currentTheme);
-  console.log('Current theme : ', currentTheme);
   return (
     <View style={styles(currentTheme).emptyListContainer}>
-      <Text style={styles(currentTheme).emptyListStyle}>No Record Found</Text>
+      <Text style={styles(currentTheme).emptyListStyle}>
+        {APP_STRINGS.NO_RECORD_FOUND}
+      </Text>
     </View>
   );
 };
@@ -17,7 +18,7 @@ const EmptyListComponent = () => {
 const styles = (currentTheme: any) =>
   StyleSheet.create({
     emptyListContainer: {
-      flex: 1,
+      flex: SIZES.flex1,
       justifyContent: 'center',
       alignItems: 'center',
     },

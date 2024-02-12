@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-// import 'react-native-gesture-handler';
 import {StatusBar} from 'react-native';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
@@ -17,7 +16,7 @@ import {COLORS_PRIMARY} from './src/constants';
 import {IS_IOS} from './src/constants/theme';
 import ProductDetailScreen from './src/screens/ProductDetailScreen';
 import ProductScreen from './src/screens/ProductScreen';
-import {deleteLocalStorage} from './src/utils/Reusables';
+import {consoleLog, deleteLocalStorage} from './src/utils/Reusables';
 
 export type RootStackParamList = {
   login: any;
@@ -42,15 +41,15 @@ const Main = () => {
   useUpdateEffect(() => {
     if (!errorResponse?.status) {
       setShowAlert(true);
-      console.log('Error Response : ', errorResponse);
+      consoleLog('Error Response : ', errorResponse);
     }
   }, [errorResponse]);
 
   useUpdateEffect(() => {
     if (portraitStatus) {
-      console.log('Portrait Status : ', portraitStatus);
+      consoleLog('Portrait Status : ', portraitStatus);
     } else {
-      console.log('Portrait Status : ', portraitStatus);
+      consoleLog('Portrait Status : ', portraitStatus);
     }
   }, [portraitStatus]);
 

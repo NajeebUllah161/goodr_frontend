@@ -25,7 +25,7 @@ import BackArrow from '../assets/images/back_arrow.svg';
 import {ProductDetailsResponse} from '../classes/ProductDetailsResponse';
 import Loader from '../components/Loader';
 import {COLORS_PRIMARY, FONTS, SIZES} from '../constants';
-import {END_POINTS} from '../constants/theme';
+import {APP_STRINGS, END_POINTS} from '../constants/theme';
 import {SINGLE_PRODUCT} from '../redux/Types';
 import apiCall from '../redux/actions/apiCall';
 import {consoleLog} from '../utils/Reusables';
@@ -78,52 +78,18 @@ const ProductDetailScreen = ({
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={styles.root}>
       <SafeAreaView>
-        <View
-          style={{
-            flexDirection: 'row',
-            backgroundColor: COLORS_PRIMARY.white,
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            padding: SIZES.p8,
-            shadowColor: COLORS_PRIMARY.shadowColor,
-            marginTop: StatusBar.currentHeight,
-            shadowOffset: {
-              width: 0,
-              height: 1,
-            },
-            shadowOpacity: 0.1,
-            shadowRadius: 2,
-            elevation: 5,
-          }}>
+        <View style={styles.subContainer}>
           <TouchableOpacity
             activeOpacity={0.6}
             onPress={() => navigation.goBack()}
-            style={{
-              shadowColor: COLORS_PRIMARY.shadowColor,
-              shadowOffset: {
-                width: 1,
-                height: 0,
-              },
-              shadowOpacity: 0.2,
-              shadowRadius: 2,
-              elevation: 5,
-              padding: SIZES.p8,
-              borderRadius: SIZES.r60,
-              marginRight: SIZES.m10,
-              marginLeft: SIZES.m4,
-              backgroundColor: COLORS_PRIMARY.white,
-            }}>
+            style={styles.backArrow}>
             <BackArrow height={hp(2.1)} width={hp(2.1)} />
           </TouchableOpacity>
           <Text
-            style={{
-              fontSize: fp(2.2),
-              color: COLORS_PRIMARY.heading,
-              fontFamily: FONTS.InterMedium,
-            }}
-            children="Product Details"
+            style={styles.productDetails}
+            children={APP_STRINGS.PRODUCT_DETAILS}
           />
         </View>
       </SafeAreaView>
@@ -132,51 +98,17 @@ const ProductDetailScreen = ({
         automaticallyAdjustContentInsets={true}
         showsVerticalScrollIndicator={false}
         style={styles.container}>
-        {/* Background Image */}
         <Pressable>
           <Image
             source={{uri: image}}
-            style={{
-              height: hp(23),
-              width: '100%',
-              marginTop: hp(2),
-            }}
+            style={styles.productImage}
             resizeMethod="resize"
           />
         </Pressable>
-        <View
-          style={{
-            width: '100%',
-            marginVertical: hp(2.5),
-            height: StyleSheet.hairlineWidth * 4,
-            backgroundColor: COLORS_PRIMARY.placeholder,
-          }}
-        />
-        <View
-          style={{
-            backgroundColor: COLORS_PRIMARY.white,
-            marginHorizontal: SIZES.p22,
-            padding: SIZES.p8,
-          }}>
-          <Text
-            style={{
-              fontFamily: FONTS.InterMedium,
-              color: COLORS_PRIMARY.heading,
-              fontSize: fp(2),
-              width: '80%',
-            }}
-            children={title}
-          />
-          <Text
-            style={{
-              fontFamily: FONTS.InterRegular,
-              color: COLORS_PRIMARY.subHeading,
-              fontSize: fp(1.8),
-              lineHeight: SIZES.screenHeight > 926 ? 0 : 24,
-              marginTop: hp(2.8),
-            }}
-            children={description}
-          />
+        <View style={styles.widthLine} />
+        <View style={styles.containerLast}>
+          <Text style={styles.title} children={title} />
+          <Text style={styles.description} children={description} />
         </View>
       </ScrollView>
       {loading && <Loader />}
@@ -188,8 +120,74 @@ export default ProductDetailScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: SIZES.flex1,
     backgroundColor: COLORS_PRIMARY.white,
     zIndex: -1,
   },
+  description: {
+    fontFamily: FONTS.InterRegular,
+    color: COLORS_PRIMARY.subHeading,
+    fontSize: fp(1.8),
+    lineHeight: SIZES.screenHeight > 926 ? 0 : 24,
+    marginTop: hp(2.8),
+  },
+  title: {
+    fontFamily: FONTS.InterMedium,
+    color: COLORS_PRIMARY.heading,
+    fontSize: fp(2),
+    width: '80%',
+  },
+  containerLast: {
+    backgroundColor: COLORS_PRIMARY.white,
+    marginHorizontal: SIZES.p22,
+    padding: SIZES.p8,
+  },
+  widthLine: {
+    width: '100%',
+    marginVertical: hp(2.5),
+    height: StyleSheet.hairlineWidth * 4,
+    backgroundColor: COLORS_PRIMARY.placeholder,
+  },
+  productImage: {
+    height: hp(23),
+    width: '100%',
+    marginTop: hp(2),
+  },
+  productDetails: {
+    fontSize: fp(2.2),
+    color: COLORS_PRIMARY.heading,
+    fontFamily: FONTS.InterMedium,
+  },
+  backArrow: {
+    shadowColor: COLORS_PRIMARY.shadowColor,
+    shadowOffset: {
+      width: 1,
+      height: 0,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 5,
+    padding: SIZES.p8,
+    borderRadius: SIZES.r60,
+    marginRight: SIZES.m10,
+    marginLeft: SIZES.m4,
+    backgroundColor: COLORS_PRIMARY.white,
+  },
+  subContainer: {
+    flexDirection: 'row',
+    backgroundColor: COLORS_PRIMARY.white,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    padding: SIZES.p8,
+    shadowColor: COLORS_PRIMARY.shadowColor,
+    marginTop: StatusBar.currentHeight,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  root: {flex: SIZES.flex1},
 });

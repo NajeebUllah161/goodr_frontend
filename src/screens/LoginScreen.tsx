@@ -11,7 +11,6 @@ import {
 import {
   responsiveFontSize as fp,
   responsiveHeight as hp,
-  responsiveWidth as wp,
 } from 'react-native-responsive-dimensions';
 
 // constants
@@ -21,21 +20,19 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useUpdateEffect} from 'react-use';
 import {RootStackParamList} from '../../Main';
 import ToggleEye from '../assets/images/eye_toggle.svg';
-import LoginContainerBg from '../assets/images/login_container_bg.svg';
 import {LoginResponse} from '../classes/LoginResponse';
 import Loader from '../components/Loader';
 import {COLORS_PRIMARY, FONTS, SIZES} from '../constants';
 import {
+  APP_STRINGS,
   END_POINTS,
   IS_ANDROID,
-  IS_IOS,
   METHODS,
   height,
 } from '../constants/theme';
-import {LOGIN, PRODUCTS} from '../redux/Types';
+import {LOGIN} from '../redux/Types';
 import apiCall from '../redux/actions/apiCall';
 import {consoleLog, isNotEmpty} from '../utils/Reusables';
-import {ProductsResponse} from '../classes/ProductResponse';
 
 export type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -49,7 +46,7 @@ const LoginScreen = ({navigation}: {navigation: LoginScreenNavigationProp}) => {
   );
   const [secureEntry, setSecureEntry] = useState(true);
 
-  const [emailAddress, setEmailAddress] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
 
@@ -81,7 +78,7 @@ const LoginScreen = ({navigation}: {navigation: LoginScreenNavigationProp}) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
-      setEmailAddress('');
+      setUsername('');
       setPassword('');
     });
 
@@ -95,11 +92,11 @@ const LoginScreen = ({navigation}: {navigation: LoginScreenNavigationProp}) => {
   };
 
   const loginHandler = () => {
-    if (!isNotEmpty(emailAddress)) {
+    if (!isNotEmpty(username)) {
       dispatch({
-        type: 'ERROR',
+        type: APP_STRINGS.TYPE_ERROR,
         payload: {
-          title: 'Validation Error',
+          title: APP_STRINGS.TITLE_VALIDATION_ERROR,
           error: 'Email required',
           status: false,
         },
@@ -109,9 +106,9 @@ const LoginScreen = ({navigation}: {navigation: LoginScreenNavigationProp}) => {
 
     if (!isNotEmpty(password)) {
       dispatch({
-        type: 'ERROR',
+        type: APP_STRINGS.TYPE_ERROR,
         payload: {
-          title: 'Validation Error',
+          title: APP_STRINGS.TITLE_VALIDATION_ERROR,
           error: 'Password required',
           status: false,
         },
@@ -120,7 +117,7 @@ const LoginScreen = ({navigation}: {navigation: LoginScreenNavigationProp}) => {
     }
 
     const body = {
-      username: emailAddress,
+      username: username,
       password,
     };
 
@@ -145,95 +142,43 @@ const LoginScreen = ({navigation}: {navigation: LoginScreenNavigationProp}) => {
   return (
     <KeyboardAwareScrollView
       keyboardShouldPersistTaps="handled"
-      style={{flex: SIZES.flex1}}>
-      <View
-        style={{
-          height: height,
-          backgroundColor: COLORS_PRIMARY.certifiedProfile,
-          paddingTop: hp(25),
-          paddingHorizontal: SIZES.p22,
-        }}>
-        <Text
-          children="Login"
-          style={{
-            color: COLORS_PRIMARY.white,
-            fontSize: fp(2.8),
-            fontFamily: FONTS.InterRegular,
-          }}
-        />
-        <View style={{marginTop: SIZES.m36}}>
-          {/* Label */}
-          <Text
-            children="Username"
-            style={{
-              color: COLORS_PRIMARY.white,
-              fontFamily: FONTS.InterRegular,
-              fontSize: fp(2),
-            }}
-          />
-          {/* Input */}
+      style={styles.root}>
+      <View style={styles.secondRoot}>
+        <Text children={APP_STRINGS.LOGIN} style={styles.login} />
+        <View style={styles.rowContainer}>
+          <Text children={APP_STRINGS.USERNAME} style={styles.textUsername} />
           <TextInput
             autoCapitalize="none"
             selectionColor={
-              IS_ANDROID ? 'rgba(0, 0, 0, 0.5)' : COLORS_PRIMARY.white
+              IS_ANDROID ? COLORS_PRIMARY.selectionColor : COLORS_PRIMARY.white
             }
-            textContentType="emailAddress"
-            value={emailAddress}
+            textContentType="givenName"
+            value={username}
             autoCorrect={false}
-            onChangeText={setEmailAddress}
-            style={{
-              borderWidth: 1,
-              borderColor: COLORS_PRIMARY.white,
-              marginTop: SIZES.m10,
-              padding: SIZES.p11,
-              borderRadius: SIZES.r5,
-              color: COLORS_PRIMARY.white,
-              fontFamily: FONTS.InterRegular,
-              fontSize: fp(1.8),
-            }}
+            onChangeText={setUsername}
+            style={styles.inputUsername}
           />
         </View>
-        <View style={{marginTop: SIZES.m30}}>
-          {/* Label */}
-          <Text
-            children="Password"
-            style={{
-              color: COLORS_PRIMARY.white,
-              fontFamily: FONTS.InterRegular,
-              fontSize: fp(2),
-            }}
-          />
-          {/* Input */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: SIZES.m10,
-            }}>
+        <View style={styles.rowContainer}>
+          <Text children={APP_STRINGS.PASSWORD} style={styles.textPassword} />
+          <View style={styles.containerPassword}>
             <TextInput
               autoCapitalize="none"
               selectionColor={
-                IS_ANDROID ? 'rgba(0, 0, 0, 0.5)' : COLORS_PRIMARY.white
+                IS_ANDROID
+                  ? COLORS_PRIMARY.selectionColor
+                  : COLORS_PRIMARY.white
               }
               secureTextEntry={secureEntry}
               textContentType="password"
               value={password}
               onChangeText={setPassword}
-              style={{
-                flex: 1,
-                borderWidth: 1,
-                borderColor: COLORS_PRIMARY.white,
-                padding: SIZES.p11,
-                borderRadius: SIZES.r5,
-                color: COLORS_PRIMARY.white,
-                fontFamily: FONTS.InterRegular,
-                fontSize: fp(1.8),
-              }}
+              style={styles.inputPassword}
             />
             <TouchableOpacity
               onPress={toggleHandler}
               activeOpacity={0.7}
-              style={{position: 'absolute', end: 4}}>
+              style={styles.toggle}>
               <ToggleEye height={hp(3.3)} width={hp(3.3)} />
             </TouchableOpacity>
           </View>
@@ -243,7 +188,7 @@ const LoginScreen = ({navigation}: {navigation: LoginScreenNavigationProp}) => {
             activeOpacity={0.8}
             style={styles.touchableLogin}
             onPress={loginHandler}>
-            <Text children="Login" style={styles.txtLogin} />
+            <Text children={APP_STRINGS.LOGIN} style={styles.txtLogin} />
           </TouchableOpacity>
         </View>
       </View>
@@ -255,47 +200,19 @@ const LoginScreen = ({navigation}: {navigation: LoginScreenNavigationProp}) => {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS_PRIMARY.white,
+  root: {flex: SIZES.flex1},
+  secondRoot: {
+    height: height,
+    backgroundColor: COLORS_PRIMARY.certifiedProfile,
+    paddingTop: hp(25),
+    paddingHorizontal: SIZES.p22,
   },
-  subContainerCheckbox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginEnd: wp(2),
-  },
-  checkbox: {
-    height: SIZES.screenHeight > 926 ? hp(2) : 14,
-    width: SIZES.screenHeight > 926 ? wp(4) : 14,
-    marginEnd: IS_IOS ? SIZES.m10 : SIZES.m20,
-  },
-  txtRemember: {
+  login: {
     color: COLORS_PRIMARY.white,
+    fontSize: fp(2.8),
     fontFamily: FONTS.InterRegular,
-    fontSize: SIZES.screenHeight > 926 ? fp(2) : SIZES.f15,
-  },
-  txtForgotPwd: {
-    color: COLORS_PRIMARY.white,
-    fontFamily: FONTS.InterMedium,
-    fontSize: SIZES.screenHeight > 926 ? fp(2) : SIZES.f15,
   },
   containerLastRow: {marginTop: SIZES.m36},
-  containerSignup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  txtSignup: {
-    color: COLORS_PRIMARY.white,
-    fontFamily: FONTS.InterMedium,
-    fontSize: SIZES.screenHeight > 926 ? fp(2) : SIZES.f15,
-    marginEnd: SIZES.m4,
-  },
-  txtHaveAcc: {
-    color: COLORS_PRIMARY.white,
-    fontFamily: FONTS.InterRegular,
-    fontSize: SIZES.screenHeight > 926 ? fp(2) : SIZES.f15,
-    marginEnd: SIZES.m4,
-  },
   touchableLogin: {
     backgroundColor: COLORS_PRIMARY.white,
     padding: SIZES.p10,
@@ -307,4 +224,41 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.InterMedium,
     fontSize: fp(2),
   },
+  rowContainer: {marginTop: SIZES.m36},
+  inputUsername: {
+    borderWidth: SIZES.bw1,
+    borderColor: COLORS_PRIMARY.white,
+    marginTop: SIZES.m10,
+    padding: SIZES.p11,
+    borderRadius: SIZES.r5,
+    color: COLORS_PRIMARY.white,
+    fontFamily: FONTS.InterRegular,
+    fontSize: fp(1.8),
+  },
+  textUsername: {
+    color: COLORS_PRIMARY.white,
+    fontFamily: FONTS.InterRegular,
+    fontSize: fp(2),
+  },
+  inputPassword: {
+    flex: SIZES.flex1,
+    borderWidth: SIZES.bw1,
+    borderColor: COLORS_PRIMARY.white,
+    padding: SIZES.p11,
+    borderRadius: SIZES.r5,
+    color: COLORS_PRIMARY.white,
+    fontFamily: FONTS.InterRegular,
+    fontSize: fp(1.8),
+  },
+  textPassword: {
+    color: COLORS_PRIMARY.white,
+    fontFamily: FONTS.InterRegular,
+    fontSize: fp(2),
+  },
+  containerPassword: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: SIZES.m10,
+  },
+  toggle: {position: 'absolute', end: 4},
 });
